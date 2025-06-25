@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Multimodal Query Test</title>
+</head>
+<body>
+  <h2>Send Image + Text Query to FastAPI</h2>
+  <form action=" https://7604-163-239-126-162.ngrok-free.app/query" method="post" enctype="multipart/form-data">
+    <label for="query">Text Query:</label><br>
+    <input type="text" name="query_text" value="What is the mode button?" size="50"><br><br>
+
+    <label for="image">Upload Image:</label><br>
+    <input type="file" name="image" accept="image/*"><br><br>
+
+    <input type="submit" value="Submit">
+  </form>
+</body>
+</html>
