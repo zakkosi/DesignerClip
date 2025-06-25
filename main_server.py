@@ -2,14 +2,13 @@ import os
 import uvicorn
 from fastapi import FastAPI, Form, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
-from pyngrok import ngrok
 from dotenv import load_dotenv
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 from io import BytesIO
 from typing import Optional
 
 # 우리가 만든 추론 엔진을 임포트합니다.
-from inference_engine import ColPaliRetriever, LLMGenerator, QueryRouter
+from inference_engine import ColPaliRetriever, LLMGenerator, QueryRouter, PatternExtractor
 
 # --- 1. 초기 설정 ---
 load_dotenv()
@@ -22,6 +21,7 @@ print("Initializing FastAPI server and loading models...")
 retriever = ColPaliRetriever(db_path=DATABASE_FILE, model_name=COLPALI_MODEL_NAME)
 router = QueryRouter(api_key=OPENAI_API_KEY)
 generator = LLMGenerator(api_key=OPENAI_API_KEY)
+pattern_extractor = PatternExtractor()
 print("✅ Initialization complete. Server is ready.")
 
 app = FastAPI()
@@ -76,3 +76,22 @@ async def handle_query(
         "intro_sentence": intro_sentence,
         "retrieved_results": final_response_items
     })
+
+@app.post("/generate-pattern")
+async def handle_pattern_generation(
+    image_filename: str = Form(...),
+    x: int = Form(...),
+    y: int = Form(...)
+):
+    """유니티에서 선택한 이미지 파일명과 클릭 좌표를 받아 패턴 생성을 요청합니다."""
+    print(f"\nReceived pattern generation request for '{image_filename}' at ({x}, {y})")
+    
+    try:
+        # PatternExtractor를 호출하여 실제 로직을 수행합니다.
+        result = pattern_extractor.extract_pattern_and_create_pbr(
+            image_filename=image_filename, x=x, y=y
+        )
+        return JSONResponse(content=result)
+    except Exception as e:
+        print(f"ERROR in pattern generation: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate pattern.")
