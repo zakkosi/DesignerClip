@@ -40,7 +40,7 @@ def process_single_image(args, seg_engine, analysis_engine):
         feature_mask = seg_engine.extract_feature_from_mask(
             image_pil, 
             clothing_mask, 
-            feature_prompt="embroidery . pattern . ornament"
+            feature_prompt="gold embroidery . metallic ornament", 
         )
         
         if feature_mask is not None:
