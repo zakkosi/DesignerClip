@@ -161,29 +161,3 @@ class LLMGenerator:
             print(f"LLM item description Error: {e}")
             return "설명을 생성하는 중 오류가 발생했습니다."
         
-# ---------------------------------------------
-# Class 4: 패턴 추출 및 PBR 생성 담당 (신규 추가)
-# ---------------------------------------------
-class PatternExtractor:
-    def __init__(self, device="cuda:0"):
-        self.device = device
-        # 나중에 이 곳에서 SAM과 PBR 생성 모델을 로드하게 됩니다.
-        print("PatternExtractor: Initialized. (Models will be loaded here later)")
-
-    def extract_pattern_and_create_pbr(self, image_filename: str, x: int, y: int):
-        """
-        입력받은 이미지와 좌표를 사용해 패턴을 추출하고 PBR 텍스처를 생성합니다.
-        (현재는 placeholder 기능만 수행)
-        """
-        print(f"PatternExtractor: Received request for '{image_filename}' at coordinates ({x}, {y})")
-        
-        # --- 여기에 SAM, 텍스처 생성, PBR 생성 AI 로직이 들어갈 예정 ---
-        
-        # 지금은 성공적으로 요청을 받았다는 의미로, 더미 결과(딕셔너리)를 반환합니다.
-        dummy_pbr_maps = {
-            "albedo_map": "path/to/generated/albedo.png",
-            "normal_map": "path/to/generated/normal.png",
-            "roughness_map": "path/to/generated/roughness.png"
-        }
-        
-        return {"status": "success", "pbr_maps": dummy_pbr_maps}

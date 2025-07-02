@@ -8,7 +8,8 @@ from io import BytesIO
 from typing import Optional
 
 # 우리가 만든 추론 엔진을 임포트합니다.
-from inference_engine import ColPaliRetriever, LLMGenerator, QueryRouter, PatternExtractor
+from inference_engine import ColPaliRetriever, LLMGenerator, QueryRouter
+from sam_engine import PatternExtractor
 
 # --- 1. 초기 설정 ---
 load_dotenv()

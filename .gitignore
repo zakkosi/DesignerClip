@@ -136,4 +136,5 @@ dmypy.json
 
 # 기타...
 .env
-artwork_images/
+artwork_images/Grounded-SAM-2/
+Grounded-SAM-2/
