@@ -7,8 +7,9 @@ import numpy as np
 
 from segmentation_engine import SegmentationEngine
 from analysis_engine import PatternAnalyzer
+from albedo_generator import AlbedoGenerator
 
-def process_single_image(args, seg_engine, analysis_engine):
+def process_single_image(args, seg_engine, analysis_engine, albedo_gen):
     print(f"--- Processing single image: {args.image_path} ---")
     try:
         image_pil = Image.open(args.image_path).convert("RGB")
@@ -16,13 +17,14 @@ def process_single_image(args, seg_engine, analysis_engine):
         print(f"Error: Image not found at {args.image_path}")
         return
 
+    # 1. 의류 마스크 추출
     clothing_mask = seg_engine.extract_mask(image_pil, text_prompt="dress . clothing .")
     if clothing_mask is None:
         print("Could not process image further as no mask was detected.")
         return
 
+    # 2. 패턴 일관성 분석
     image_np = np.array(image_pil)
-    # [수정] args에서 받은 하이퍼파라미터를 엔진에 전달
     pattern_type, score = analysis_engine.analyze_consistency(
         pattern_image_np=image_np, 
         mask=clothing_mask,
@@ -36,6 +38,37 @@ def process_single_image(args, seg_engine, analysis_engine):
     print(f"Detected Pattern Type: {pattern_type.upper()}")
     print(f"Consistency Score (Std. Dev): {score:.4f}")
 
+    # 3. 알베도 생성
+    final_albedo = None
+    output_filename = "albedo_output.png" 
+
+    # 3. 분석 결과에 따라 Albedo 맵 생성
+    if pattern_type == 'global':
+        print("\n--- Generating Albedo for GLOBAL pattern ---")
+        final_albedo = albedo_gen.generate_for_global_pattern(image_pil, clothing_mask)
+        output_filename = f"{os.path.splitext(os.path.basename(args.image_path))[0]}_albedo_global.png"
+
+    elif pattern_type == 'local':
+        print("\n--- Generating Albedo for LOCAL pattern ---")
+        feature_mask = seg_engine.extract_feature_from_mask(
+            image_pil, 
+            clothing_mask, 
+            feature_prompt="gold embroidery . metallic ornament . logo . text", # 프롬프트는 필요에 맞게 수정
+        )
+        
+        if feature_mask is not None:
+            final_albedo = albedo_gen.generate_for_local_pattern(image_pil, feature_mask)
+            output_filename = f"{os.path.splitext(os.path.basename(args.image_path))[0]}_albedo_local.png"
+
+    # 4. 최종 Albedo 맵 저장
+    if final_albedo:
+        final_albedo.save(output_filename)
+        print(f"✅ Final Albedo map saved to '{output_filename}'")
+    else:
+        print("Could not generate the final Albedo map.")
+
+    # [수정] 2차 Grounded-SAM2 결과를 시각적으로 확인하기 위한 코드
+    '''
     if pattern_type == 'local':
         feature_mask = seg_engine.extract_feature_from_mask(
             image_pil, 
@@ -49,7 +82,7 @@ def process_single_image(args, seg_engine, analysis_engine):
             feature_image_np[feature_mask] = image_np[feature_mask]
             Image.fromarray(feature_image_np).save("extracted_feature.png")
             print("✅ Saved the extracted feature to 'extracted_feature.png'")
-
+            '''
 
 def process_batch(args, seg_engine, analysis_engine):
     print(f"--- Processing batch from: {args.input_dir} ---")
@@ -113,9 +146,10 @@ if __name__ == "__main__":
 
     segmentation_engine = SegmentationEngine()
     analysis_engine = PatternAnalyzer()
+    albedo_generator = AlbedoGenerator()
 
     if args.mode == 'single':
-        process_single_image(args, segmentation_engine, analysis_engine)
+        process_single_image(args, segmentation_engine, analysis_engine, albedo_generator)
     elif args.mode == 'batch':
         # 배치 모드는 일단 기능이 복잡해지므로 나중에 추가
         print("Batch mode currently does not support 2nd-pass feature extraction.")
