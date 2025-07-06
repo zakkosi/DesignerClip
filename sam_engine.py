@@ -101,7 +101,7 @@ class PatternEngine:
 
 # --- 테스트를 위한 임시 실행 코드 ---
 if __name__ == '__main__':
-    TEST_IMAGE_PATH = "TEST2.png"
+    TEST_IMAGE_PATH = "00008.jpg"
     TEXT_PROMPT = "dress . accessories ."
     
     if not os.path.exists(TEST_IMAGE_PATH):
@@ -118,7 +118,7 @@ if __name__ == '__main__':
             output_image_np[clothing_mask] = original_image[clothing_mask]
             
             output_image_pil = Image.fromarray(output_image_np)
-            output_filename = "detected_clothing_mask.jpg"
+            output_filename = "detected_clothing_mask2.jpg"
             output_image_pil.save(output_filename)
             
             print(f"\n--- 최종 결과 ---")
