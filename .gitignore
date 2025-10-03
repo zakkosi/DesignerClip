@@ -144,3 +144,5 @@ artwork_images/Grounded-SAM-2/
 /Grounded-SAM-2/checkpoints/
 /MaterialPalette/model.ckpt
 /MaterialPalette/output/
+
+.Grounded-SAM-2/
