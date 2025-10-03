@@ -2,16 +2,17 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>PBR & DB 검색 테스트</title>
+  <title>PBR & DB 검색 테스트 (동기식)</title>
   <style>
     body { font-family: sans-serif; margin: 2em; }
     form { border: 1px solid #ccc; padding: 1em; border-radius: 5px; }
     input[type=text] { width: 500px; padding: 5px; }
     input[type=submit] { padding: 10px 15px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+    pre { background-color: #f0f0f0; padding: 1em; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; }
   </style>
 </head>
 <body>
-  <h2>스타일 적용 테스트 (FastAPI)</h2>
+  <h2>스타일 적용 테스트 (FastAPI - 동기식)</h2>
   <p>PBR로 만들고 싶은 패턴이 있는 이미지와, 적용할 옷 종류를 텍스트로 입력하세요.</p>
   
   <form id="testForm" method="post" enctype="multipart/form-data">
@@ -21,23 +22,23 @@
     <label for="image"><b>패턴 이미지 업로드:</b></label><br>
     <input type="file" name="image" accept="image/*" required><br><br>
 
-    <input type="submit" value="요청 보내기">
+    <input type="submit" value="요청 보내기 (결과가 올 때까지 대기)">
   </form>
 
   <hr>
   <h2>서버 응답:</h2>
-  <pre id="response"></pre>
+  <pre id="response">서버 응답 대기 중...</pre>
 
   <script>
-    document.getElementById('testForm').addEventListener('submit', async function(e) {
+    const form = document.getElementById('testForm');
+    const responseContainer = document.getElementById('response');
+
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      const form = e.target;
       const formData = new FormData(form);
-      const responseContainer = document.getElementById('response');
-      
-      responseContainer.textContent = '서버에 요청 중...';
-      
+      responseContainer.textContent = '서버에 요청 중... PBR 생성에 몇 분 정도 소요될 수 있습니다. 페이지를 닫지 말고 기다려주세요.';
+
       try {
         const response = await fetch('/apply-style', {
           method: 'POST',
@@ -47,12 +48,15 @@
         const result = await response.json();
         
         if (!response.ok) {
-          throw new Error(result.detail || '알 수 없는 오류');
+          // FastAPI에서 보낸 오류 메시지를 표시
+          throw new Error(result.detail || '알 수 없는 서버 오류');
         }
 
+        // 성공적인 JSON 응답을 예쁘게 출력
         responseContainer.textContent = JSON.stringify(result, null, 2);
+
       } catch (error) {
-        responseContainer.textContent = '오류 발생:\n' + error.message;
+        responseContainer.textContent = '요청 오류 발생:\n' + error.message;
       }
     });
   </script>

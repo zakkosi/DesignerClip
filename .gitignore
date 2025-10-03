@@ -25,7 +25,10 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
+*.ckpt
+*.pt
+*.safetensors
+*.bin
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -137,4 +140,7 @@ dmypy.json
 # 기타...
 .env
 artwork_images/Grounded-SAM-2/
-Grounded-SAM-2/
+/Grounded-SAM-2/gdino_checkpoints/
+/Grounded-SAM-2/checkpoints/
+/MaterialPalette/model.ckpt
+/MaterialPalette/output/
